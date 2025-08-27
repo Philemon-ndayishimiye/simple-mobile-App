@@ -1,6 +1,7 @@
 import 'dart:ffi';
 
 import 'package:flutter/material.dart';
+import 'package:shared_preferences/shared_preferences.dart';
 
 class Todo extends StatefulWidget {
   @override
@@ -10,6 +11,19 @@ class Todo extends StatefulWidget {
 class _TodoState extends State<Todo> {
   List<String> Todos = [];
   TextEditingController _inputTodo = TextEditingController();
+
+  Future<void> _loadsTodos()async{
+    final prefs = await SharedPreferences.getInstance();
+
+    setState(() {
+       Todos = prefs.getStringList('todos')??[];
+    });
+  }
+
+  Future<void> _saveTodos() async {
+    final prefs = await SharedPreferences.getInstance();
+    await prefs.setStringList('todos', Todos);
+  }
 
   void _AddToDo() {
     if (_inputTodo.text.isEmpty) {
@@ -24,10 +38,12 @@ class _TodoState extends State<Todo> {
         Todos.add(_inputTodo.text);
         _inputTodo.clear();
       });
+      _saveTodos();
     }
   }
 
   @override
+
   Widget build(BuildContext context) {
     return Scaffold(
       appBar: AppBar(
