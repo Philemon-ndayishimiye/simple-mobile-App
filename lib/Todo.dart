@@ -1,5 +1,3 @@
-import 'dart:ffi';
-
 import 'package:flutter/material.dart';
 import 'package:shared_preferences/shared_preferences.dart';
 
@@ -12,11 +10,11 @@ class _TodoState extends State<Todo> {
   List<String> Todos = [];
   TextEditingController _inputTodo = TextEditingController();
 
-  Future<void> _loadsTodos()async{
+  Future<void> _loadsTodos() async {
     final prefs = await SharedPreferences.getInstance();
 
     setState(() {
-       Todos = prefs.getStringList('todos')??[];
+      Todos = prefs.getStringList('todos') ?? [];
     });
   }
 
@@ -43,6 +41,10 @@ class _TodoState extends State<Todo> {
   }
 
   @override
+  void initState() {
+    super.initState();
+    _loadsTodos();
+  }
 
   Widget build(BuildContext context) {
     return Scaffold(
@@ -89,12 +91,18 @@ class _TodoState extends State<Todo> {
 
           Expanded(
             child: ListView(
-              children: Todos.map((todo) {
+              children: Todos.asMap().entries.map((entry) {
+                int index = entry.key;
+                String todo = entry.value;
                 return Row(
                   children: [
                     Expanded(child: ListTile(title: Text(todo))),
                     ElevatedButton(
-                      onPressed: () {},
+                      onPressed: () {
+                        setState(() {
+                          Todos.removeAt(index);
+                        });
+                      },
                       child: Text("delete"),
                       style: ElevatedButton.styleFrom(
                         backgroundColor: Colors.red,
